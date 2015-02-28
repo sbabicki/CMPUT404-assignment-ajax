@@ -99,7 +99,7 @@ def get_entity(entity):
 @app.route("/clear", methods=['POST','GET'])
 def clear():
 	myWorld.clear()
-	return "Cleared All " + json.dumps(myWorld.world())
+	return json.dumps(myWorld.world())
 
 if __name__ == "__main__":
 	app.run()

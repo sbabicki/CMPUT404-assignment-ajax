@@ -65,7 +65,7 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
 
 world = {};
 
-//XXX: TODO Make this prettier!
+// Make this prettier!
 function drawCircle(context,entity) {
 	with(context) {
 		beginPath();			  
@@ -82,10 +82,10 @@ function drawCircle(context,entity) {
 
 function prepEntity(entity) {
 	if (!entity["colour"]) {
-		entity["colour"] = "#FF0000";
+		entity["colour"] = "blue";
 	}
 	if (!entity["radius"]) {
-		entity["radius"] = 50;
+		entity["radius"] = 20;
 	}
 	return entity;
 }
@@ -146,7 +146,7 @@ function getPosition(e) {
 
 function addEntity(entity, data) {
 	world[entity] = data;
-	drawNextFrame(); // (but should we?)
+	// drawNextFrame(); // (but should we?) 
 	// Send a XHTML Request that updates the entity you just  modified!
 	url = "/entity/" + entity;
 	sendJSONXMLHTTPRequest(url, data);
@@ -267,15 +267,14 @@ function makeCounter(n) {
     var colourCounter = n;
     var colourCount = function() {
 		if (colourCounter>256){
-			colourCounter = 0;
+			colourCounter = Math.floor(Math.random() * 256);
 		}
         return colourCounter++;
     }
     return colourCount;
 }
 
-function rainbowRGBColor()
-{	
+function rainbowRGBColor() {	
 	r = red();
 	g = green();
 	b = blue();
@@ -285,11 +284,13 @@ function rainbowRGBColor()
 // Add the application specific mouse listeners!
 // Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
-	addEntityWithoutName({'x':x,'y':y,'colour':rainbowRGBColor()});
+	addEntityWithoutName({'x':x,'y':y,'colour':rainbowRGBColor(),
+					  'radius':15});
 });
 
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-	addEntityWithoutName({'x':x,'y':y,'colour':rainbowRGBColor()});
+	addEntityWithoutName({'x':x,'y':y,'colour':rainbowRGBColor(),
+						  'radius':15});
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {

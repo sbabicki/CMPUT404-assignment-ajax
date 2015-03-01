@@ -38,8 +38,13 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
 		if (xhr.readyState==4) {
 			try {
 				if (xhr.status==200) {
-					//XXX: parse some JSON from the request!
-					//XXX: Pass the data to the callback!
+					// parse some JSON from the request!
+					// Pass the data to the callback!
+					var requestJson = JSON.parse(xhr.responseText);
+					if (callback) {
+						callback(requestJson);
+					}
+
 				}
 			} 
 			catch(e) {
@@ -47,9 +52,14 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
 			}
 		}
 	};
-	//XXX: POST to a URL
-	//XXX: set the mimetype and the accept headers!
+	
+	// POST to a URL
+	// set the mimetype and the accept headers!
 	// Remember to use application/json !
+	xhr.open("POST", url, true);
+	xhr.setRequestHeader("Content-Type","application/json");
+	xhr.setRequestHeader("Accept","application/json");
+	xhr.send(JSON.stringify(objects));
 }
 
 
@@ -137,7 +147,9 @@ function getPosition(e) {
 function addEntity(entity, data) {
 	world[entity] = data;
 	drawNextFrame(); // (but should we?)
-	//XXX: Send a XHTML Request that updates the entity you just  modified!
+	// Send a XHTML Request that updates the entity you just  modified!
+	url = "/entity/" + entity;
+	sendJSONXMLHTTPRequest(url, data);
 
 }
 
@@ -244,22 +256,23 @@ mouse = (function() {
 	return self;
 })();
 
-// Function based on example from class:
-// http://webdocs.cs.ualberta.ca/~hindle1/2014/CMPUT404-Javascript-Slides/#/8
-function makeCounter(n) {
-    var counter = n;
-    var count = function() {
-		if (counter>256){
-			counter = 0;
-		}
-        return counter++;
-    }
-    return count;
-}
 
 var red = makeCounter(0);
 var green = makeCounter(80);
 var blue = makeCounter(150);
+
+// Function based on example from class:
+// http://webdocs.cs.ualberta.ca/~hindle1/2014/CMPUT404-Javascript-Slides/#/8
+function makeCounter(n) {
+    var colourCounter = n;
+    var colourCount = function() {
+		if (colourCounter>256){
+			colourCounter = 0;
+		}
+        return colourCounter++;
+    }
+    return colourCount;
+}
 
 function rainbowRGBColor()
 {	
@@ -268,8 +281,9 @@ function rainbowRGBColor()
 	b = blue();
   	return 'rgb(' + r + ',' + g + ',' + b + ')';
 }
+
 // Add the application specific mouse listeners!
-//XXX: TODO Make these prettier!
+// Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
 	addEntityWithoutName({'x':x,'y':y,'colour':rainbowRGBColor()});
 });
@@ -284,7 +298,11 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
 });
 
 function update() {
-	//XXX: TODO Get the world from the webservice using a XMLHTTPRequest
+	// Get the world from the webservice using a XMLHTTPRequest
+	sendJSONXMLHTTPRequest('/world', null, function(requestJson) {
+		world = requestJson;
+		drawNextFrame();
+	});
 	drawFrame();
 }
 
